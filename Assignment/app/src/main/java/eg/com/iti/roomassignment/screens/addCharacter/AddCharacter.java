@@ -12,11 +12,12 @@ import android.widget.Toast;
 import eg.com.iti.roomassignment.R;
 
 public class AddCharacter extends AppCompatActivity {
-
+    public static final String EXTRA_ID =
+            "eg.com.iti.roomarchitecture.EXTRA_ID";
     public static final String EXTRA_NAME =
-            "eg.com.iti.roomarchitecture.EXTRA_TITLE";
+            "eg.com.iti.roomarchitecture.EXTRA_NAME";
     public static final String EXTRA_IMAGEURL =
-            "eg.com.iti.roomarchitecture.EXTRA_DESCRIPTION";
+            "eg.com.iti.roomarchitecture.EXTRA_IMAGEURL";
 
     private EditText editTextName;
     private EditText editTextImageURL;
@@ -28,10 +29,16 @@ public class AddCharacter extends AppCompatActivity {
 
         editTextName = findViewById(R.id.edit_text_name);
         editTextImageURL = findViewById(R.id.edit_text_imageUrl);
-
-
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Note");
+        Intent intent = getIntent();
+
+        if (intent.hasExtra(EXTRA_ID)) {
+            setTitle("Edit Note");
+            editTextName.setText(intent.getStringExtra(EXTRA_NAME));
+            editTextImageURL.setText(intent.getStringExtra(EXTRA_IMAGEURL));
+        } else {
+            setTitle("Add Note");
+        }
     }
 
     private void saveNote() {
@@ -46,7 +53,10 @@ public class AddCharacter extends AppCompatActivity {
         Intent data = new Intent();
         data.putExtra(EXTRA_NAME, name);
         data.putExtra(EXTRA_IMAGEURL, imageUrl);
-
+        int id = getIntent().getIntExtra(EXTRA_ID, -1);
+        if (id != -1) {
+            data.putExtra(EXTRA_ID, id);
+        }
         setResult(RESULT_OK, data);
         finish();
     }

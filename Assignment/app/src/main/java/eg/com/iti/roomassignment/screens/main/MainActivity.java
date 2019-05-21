@@ -25,7 +25,8 @@ import eg.com.iti.roomassignment.adapter.CharacterAdapter;
 import eg.com.iti.roomassignment.screens.addCharacter.AddCharacter;
 
 public class MainActivity extends AppCompatActivity {
-    public static final int ADD_NOTE_REQUEST = 1;
+    public static final int ADD_NOTE_REQUEST  = 1;
+    public static final int EDIT_NOTE_REQUEST = 2;
 
     private CharacterViewModel noteViewModel;
 
@@ -71,21 +72,52 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Character deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(recyclerView);
+
+        adapter.setOnItemClickListener(new CharacterAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Character character) {
+                Intent intent = new Intent(MainActivity.this , AddCharacter.class );
+                intent.putExtra(AddCharacter.EXTRA_ID,character.getId());
+                intent.putExtra(AddCharacter.EXTRA_NAME,character.getName());
+                intent.putExtra(AddCharacter.EXTRA_IMAGEURL,character.getImageUrl());
+                startActivityForResult(intent, EDIT_NOTE_REQUEST);
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
-            String title = data.getStringExtra(AddCharacter.EXTRA_NAME);
-            String description = data.getStringExtra(AddCharacter.EXTRA_IMAGEURL);
+        if (requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK)
+        {
+            String name = data.getStringExtra(AddCharacter.EXTRA_NAME);
+            String imageURL = data.getStringExtra(AddCharacter.EXTRA_IMAGEURL);
 
-            Character note = new Character(title, description);
-            noteViewModel.insert(note);
+            Character character = new Character(name, imageURL);
+            noteViewModel.insert(character);
 
             Toast.makeText(this, "Character saved", Toast.LENGTH_SHORT).show();
-        } else {
+        }
+        else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK)
+        {
+            int id = data.getIntExtra(AddCharacter.EXTRA_ID, -1);
+            if (id == -1) {
+                Toast.makeText(this, "Character can't be updated", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String name = data.getStringExtra(AddCharacter.EXTRA_NAME);
+            String imageURL = data.getStringExtra(AddCharacter.EXTRA_IMAGEURL);
+
+            Character character = new Character(name, imageURL);
+            character.setId(id);
+            noteViewModel.update(character);
+
+            Toast.makeText(this, "Character updated", Toast.LENGTH_SHORT).show();
+        }
+        else
+            {
             Toast.makeText(this, "Character not saved", Toast.LENGTH_SHORT).show();
         }
     }

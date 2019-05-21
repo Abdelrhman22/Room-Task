@@ -22,7 +22,7 @@ import eg.com.iti.roomassignment.R;
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterHolder> {
     private List<Character> characters = new ArrayList<>();
     Context context;
-
+    private OnItemClickListener listener;
     public CharacterAdapter(Context context) {
         this.context = context;
     }
@@ -49,8 +49,8 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         return characters.size();
     }
 
-    public void setNotes(List<Character> notes) {
-        this.characters = notes;
+    public void setNotes(List<Character> characters) {
+        this.characters = characters;
         notifyDataSetChanged();
     }
     public Character getCharacterAt(int position) {
@@ -64,7 +64,22 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
             super(itemView);
             character_name = itemView.findViewById(R.id.character_name);
             character_imageView = itemView.findViewById(R.id.character_imageView);
-
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (listener != null && position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(characters.get(position));
+                    }
+                }
+            });
         }
+    }
+    public interface OnItemClickListener {
+        void onItemClick(Character character);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }
