@@ -2,6 +2,9 @@ package eg.com.iti.roomassignment.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.recyclerview.extensions.AsyncDifferConfig;
+import android.support.v7.recyclerview.extensions.ListAdapter;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,13 +22,26 @@ import java.util.List;
 import eg.com.iti.roomassignment.room.Character;
 import eg.com.iti.roomassignment.R;
 
-public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterHolder> {
-    private List<Character> characters = new ArrayList<>();
+public class CharacterAdapter extends ListAdapter<Character, CharacterAdapter.CharacterHolder> {
+
     Context context;
     private OnItemClickListener listener;
-    public CharacterAdapter(Context context) {
-        this.context = context;
+
+    public CharacterAdapter() {
+        super(DIFF_CALLBACK);
     }
+    private static final DiffUtil.ItemCallback<Character> DIFF_CALLBACK = new DiffUtil.ItemCallback<Character>() {
+        @Override
+        public boolean areItemsTheSame(Character oldItem, Character newItem) {
+            return oldItem.getId() == newItem.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(Character oldItem, Character newItem) {
+            return oldItem.getName().equals(newItem.getName()) &&
+                    oldItem.getImageUrl().equals(newItem.getImageUrl());
+        }
+    };
 
     @NonNull
     @Override
@@ -37,24 +53,24 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
 
     @Override
     public void onBindViewHolder(@NonNull CharacterHolder holder, int position) {
-        Character currentCharacter = characters.get(position);
+        Character currentCharacter = getItem(position);
         holder.character_name.setText(currentCharacter.getName());
         Log.i("characterName", "" + currentCharacter.getName());
         Log.i("characterImageURL", "" + currentCharacter.getImageUrl());
         Picasso.get().load(currentCharacter.getImageUrl()).into(holder.character_imageView);
     }
-
+    /*
     @Override
     public int getItemCount() {
         return characters.size();
     }
-
     public void setNotes(List<Character> characters) {
         this.characters = characters;
         notifyDataSetChanged();
     }
+    */
     public Character getCharacterAt(int position) {
-        return characters.get(position);
+        return getItem(position);
     }
     class CharacterHolder extends RecyclerView.ViewHolder {
         private TextView character_name;
@@ -69,7 +85,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (listener != null && position != RecyclerView.NO_POSITION) {
-                        listener.onItemClick(characters.get(position));
+                        listener.onItemClick(getItem(position));
                     }
                 }
             });

@@ -48,14 +48,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        final CharacterAdapter adapter = new CharacterAdapter(MainActivity.this);
+        final CharacterAdapter adapter = new CharacterAdapter();
         recyclerView.setAdapter(adapter);
 
         noteViewModel = ViewModelProviders.of(this).get(CharacterViewModel.class);
         noteViewModel.getAllCharacters().observe(this, new Observer<List<Character>>() {
             @Override
             public void onChanged(@Nullable List<Character> notes) {
-                adapter.setNotes(notes);
+                adapter.submitList(notes);
             }
         });
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
